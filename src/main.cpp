@@ -30,31 +30,26 @@ struct Resources
 
         settings.setup();
         io_expander.setup(settings.readRelayFlags());
-        pinMode(LED_BUILTIN, OUTPUT);
 
-
-        Serial.println("load settings");
+        // -- load settings
 
         KeyEventsRelaysAction a;
         KeyEventsRelaysActionHelper h(a);
         settings.readKeyRelayActions(a);
 
-        Serial.println("store settings");
-        uint8_t foo = (uint8_t) a.key_code[0].event_type[0].relay_actuation[0];
-        a.key_code[0].event_type[0].relay_actuation[0] = static_cast<Relay::Actuation>(
-                ++foo % 3);
-
-        settings.writeKeyRelayActions(a);
-        settings.saveSettings();
         h.print();
-
         settings.print();
         settings.printMemoryUsage();
+
+        // --- LED
+
+        pinMode(LED_BUILTIN, OUTPUT);
+        digitalWrite(LED_BUILTIN, HIGH);
+        wifi_status_led_uninstall();
     }
 
     void process()
     {
-        digitalWrite(LED_BUILTIN, LOW);
     }
 } r;
 
