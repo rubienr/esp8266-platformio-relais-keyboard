@@ -14,25 +14,27 @@ struct KeyEvent
         Pressed, Released, Repeated, DoublePressed, None, LastEnumeration
     };
 
+    using UnterlyingTypeofKey = std::underlying_type<Key>::type;
+    using UnterlyingTypeofType = std::underlying_type<Type>::type;
 
     constexpr static uint8_t keyEnumerationsCount()
     {
-        return static_cast<std::underlying_type<Key>::type>(Key::LastEnumeration);
+        return static_cast<UnterlyingTypeofKey>(Key::LastEnumeration);
     }
 
     constexpr static uint8_t keyTypeEnumerationsCount()
     {
-        return static_cast<std::underlying_type<Type>::type>(Type::LastEnumeration);
+        return static_cast<UnterlyingTypeofType>(Type::LastEnumeration);
     }
 
-    static std::underlying_type<Key>::type uint8FromKey(Key ke)
-    {
-        return static_cast<std::underlying_type<Key>::type>(ke);
+    static uint8_t uint8FromKey(Key ke)
+    { 
+        return static_cast<UnterlyingTypeofKey>(ke); 
     }
 
     constexpr static uint8_t uint8FromKeyType(Type kt)
     {
-        return static_cast<std::underlying_type<Type>::type>(kt);
+        return static_cast<UnterlyingTypeofType>(kt);
     }
 
     static Type keyTypeFromUint8(uint8_t kt)

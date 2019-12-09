@@ -7,7 +7,7 @@
 
 cmake_minimum_required(VERSION 3.2)
 
-project("src")
+project("esp8266-platformio-relays-keyboard")
 
 include(CMakeListsPrivate.txt)
 
@@ -88,7 +88,15 @@ add_custom_target(
 )
 
 add_custom_target(
-        ALL ALL
+        UPLOAD_MOITOR ALL
+        COMMAND ${PLATFORMIO_CMD} -f -c clion run --target upload "$<$<NOT:$<CONFIG:All>>:-e${CMAKE_BUILD_TYPE}>"
+        COMMAND sleep 1
+        COMMAND ${PLATFORMIO_CMD} -f -c clion device monitor "$<$<NOT:$<CONFIG:All>>:-e${CMAKE_BUILD_TYPE}>"
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(
+        UPLOAD_UPLOADFS_MONITOR ALL
         COMMAND ${PLATFORMIO_CMD} -f -c clion run --target upload "$<$<NOT:$<CONFIG:All>>:-e${CMAKE_BUILD_TYPE}>"
         COMMAND ${PLATFORMIO_CMD} -f -c clion run --target uploadfs "$<$<NOT:$<CONFIG:All>>:-e${CMAKE_BUILD_TYPE}>"
         COMMAND sleep 1
@@ -96,4 +104,4 @@ add_custom_target(
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/display/Display.cpp src/display/Display.h src/keyboard/Keyboard.cpp src/keyboard/Keyboard.h src/keyboard/KeyEvent.h src/keyboard/KeyEventReceiver.h src/main/KeyEventHandler.h src/powersafe/StandbyOfficer.h src/main/OperatingMode.h src/expansion_board/ExpansionBoard.cpp src/expansion_board/ExpansionBoard.h src/main/Settings.cpp src/main/Settings.h src/relay_board/RelayStrings.h src/relay_board/RelayStrings.cpp src/relay_board/RelayEventsActionHelper.cpp src/relay_board/RelayEventsActionHelper.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST})

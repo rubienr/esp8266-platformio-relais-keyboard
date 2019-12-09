@@ -2,7 +2,7 @@
 
 #include "main/Settings.h"
 #include <stdint.h>
-#include "relay_board/RelayEventsActions.h"
+#include "RelayEventsActions.h"
 
 class RelaySettingsStorage : public Settings
 {
@@ -21,11 +21,11 @@ public:
     void writeKeyRelayActions(const RelayState &a);
 
 protected:
-    void readRelayActuation(RelayState::Wrapped::Wrapped &a, JsonVariant node);
+    void readRelayActuation(RelayState::ElementType::ElementType &a, JsonVariant node);
 
-    void writeRelayActuation(const RelayState::Wrapped::Wrapped &a, JsonVariant node);
+    void writeRelayActuation(const RelayState::ElementType::ElementType &a, JsonVariant node);
 
-    void readKeyEventRelayAction(RelayState::Wrapped &a, JsonVariant node);
+    void readKeyEventRelayAction(RelayState::ElementType &a, JsonVariant node);
 
-    void writeKeyEventRelayAction(const RelayState::Wrapped &a, JsonVariant node);
+    void writeKeyEventRelayAction(const RelayState::ElementType &a, JsonVariant node);
 };

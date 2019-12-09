@@ -8,9 +8,9 @@ ExpansionBoard::ExpansionBoard(uint8_t address, uint8_t chip) : m_address(addres
 
 void ExpansionBoard::setup(uint16_t output_pin_values)
 {
-    //Wire.setClock(100000L);
+    Wire.setClock(100000L);
     begin(m_address, m_chip);
-    setModeAllOutput(output_pin_values);
+    setModeAllOutput(0xffff);
 }
 
 void ExpansionBoard::setModeAllOutput(uint16_t initial_output_pin_values)

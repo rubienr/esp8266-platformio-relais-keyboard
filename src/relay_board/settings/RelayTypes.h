@@ -9,7 +9,7 @@ struct Relay
         Activate, Release, NoAction
     };
 
-    static std::underlying_type<Actuation>::type uint8FromActuation(Actuation ra)
+    static uint8_t uint8FromActuation(Actuation ra)
     {
         return static_cast<std::underlying_type<Actuation>::type>(ra);
     }
