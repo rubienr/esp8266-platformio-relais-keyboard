@@ -23,8 +23,9 @@ void Keyboard::setup(KeyEventReceiver *receiver)
     setEventReceiver(receiver);
 }
 
-void Keyboard::process()
+bool Keyboard::process()
 {
+    bool is_processed = false;
     uint16_t touched_flags = cap.touched();
 
     auto is_touched = [&](uint8_t bit_nr)
@@ -46,16 +47,16 @@ void Keyboard::process()
 
         if (is_touched(key_nr) && !was_touched(key_nr))
         {
-            Serial.print("Keyboard::process: key ");
-            Serial.print(key_nr);
+            //Serial.print("Keyboard::process: key ");
+            //Serial.print(key_nr);
 
             if (key_repeated_time_elapsed <= 250)
             {
-                Serial.println(" double-pressed ");
+                //Serial.println(" double-pressed ");
                 event.type = KeyEvent::Type::DoublePressed;
             } else
             {
-                Serial.println(" pressed ");
+                //Serial.println(" pressed ");
                 event.type = KeyEvent::Type::Pressed;
             }
 
@@ -68,9 +69,9 @@ void Keyboard::process()
             if (key_repeated_time_elapsed >= 125)
             {
                 event.type = KeyEvent::Type::Repeated;
-                Serial.print("Keyboard::process: key ");
-                Serial.print(key_nr);
-                Serial.println(" repeated");
+                //Serial.print("Keyboard::process: key ");
+                //Serial.print(key_nr);
+                //Serial.println(" repeated");
                 ++num_key_repeats;
                 key_repeated_time_elapsed = 0;
             }
@@ -78,20 +79,20 @@ void Keyboard::process()
         {
             event.type = KeyEvent::Type::Released;
             num_key_repeats = 0;
-            Serial.print("Keyboard::process: key ");
-            Serial.print(key_nr);
-            Serial.println(" released");
+            //Serial.print("Keyboard::process: key ");
+            //Serial.print(key_nr);
+            //Serial.println(" released");
         }
 
         event.repeated = num_key_repeats;
 
         if (key_event_receiver != nullptr && event.type != KeyEvent::Type::None)
         {
-            key_event_receiver->take(event);
+            is_processed = key_event_receiver->take(event);
         }
     }
-
     last_touched_flags = touched_flags;
+    return is_processed;
 }
 
 bool Keyboard::setEventReceiver(KeyEventReceiver *receiver)

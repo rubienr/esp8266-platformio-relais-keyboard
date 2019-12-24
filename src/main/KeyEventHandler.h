@@ -35,20 +35,20 @@ public:
     bool take(KeyEvent e) override
     {
         digitalWrite(LED_BUILTIN, LOW);
-        display.clearDisplay();
-        display.setCursor(0, 0);
+        display.reset();
         display.printf("KEY %d \n", std::underlying_type<KeyEvent::Key>::type(e.key));
         display.printf("PRE %d \n", (e.type == KeyEvent::Type::Pressed));
         display.printf("REL %d \n", (e.type == KeyEvent::Type::Released));
         display.printf("REP %d \n", e.repeated);
+        display.printf("MODE %d \n", OperatingMode::uint8FromMode(operating_mode.getMode()));
         display.display();
 
-        Serial.print("KeyEventHandler::take: key=");
+/*      Serial.print("KeyEventHandler::take: key=");
         Serial.print(std::underlying_type<KeyEvent::Key>::type(e.key));
         Serial.print(" type=");
         Serial.print(std::underlying_type<KeyEvent::Type>::type(e.type));
         Serial.print(" repeated=");
-        Serial.println(e.repeated);
+        Serial.println(e.repeated);*/
 
         bool consumed = false;
         standby_officer.reset();
@@ -56,8 +56,8 @@ public:
 
         if (!consumed && e.type == KeyEvent::Type::Repeated)
         {
-            //const uint8_t long_press = 8;
-            //const uint8_t extra_long_press = 2 * long_press;
+            const uint8_t long_press = 8;
+            const uint8_t extra_long_press = 2 * long_press;
 
             switch (e.key)
             {
@@ -78,6 +78,16 @@ public:
                 case KeyEvent::Key::Key7:
                     break;
                 case KeyEvent::Key::Key8:
+                    if (e.repeated >= extra_long_press && operating_mode == OperatingMode::Mode::Normal)
+                    {
+                        operating_mode = OperatingMode::Mode::SwitchToWifi;
+                        consumed = true;
+
+                        display.clearDisplay();
+                        display.setCursor(0, 0);
+                        display.printf("MODE %d \n", OperatingMode::uint8FromMode(operating_mode.getMode()));
+                        display.display();
+                    }
                     break;
                 case KeyEvent::Key::Key9:
                     break;

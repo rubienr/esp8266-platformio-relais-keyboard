@@ -1,0 +1,23 @@
+<html>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <head>
+        <script type="text/javascript" src="/html/scripts.js"></script>
+        <script language="JavaScript">
+            function init() {
+                loadJSON("/api/settings/relay/get", function(response) {
+                    console.log(response);
+                    settings = JSON.parse(response);
+                    createLegend("legend");
+                    createNodesFromJson("settings");
+                    loadDataFromJson();
+                });
+            };
+
+            init();
+        </script>
+    </head>
+    <body>
+        <div id="legend"></div>
+        <div id="settings"></div>
+    </body>
+</html>

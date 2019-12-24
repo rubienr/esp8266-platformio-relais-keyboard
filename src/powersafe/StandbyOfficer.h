@@ -9,7 +9,7 @@ struct StandbyOfficer
             seconds_idle_before_standby(seconds_idle_before_standby)
     {}
 
-    void process()
+    void process(std::function<void()> on_standby_callback)
     {
         if (!enabled)
             return;
@@ -17,8 +17,7 @@ struct StandbyOfficer
         if (elapsed_seconds >= seconds_idle_before_standby)
         {
             disable();
-            digitalWrite(LED_BUILTIN, LOW);
-            ESP.deepSleep(ESP.deepSleepMax());
+            on_standby_callback();
         }
     }
 

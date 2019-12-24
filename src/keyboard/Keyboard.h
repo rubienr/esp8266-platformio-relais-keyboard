@@ -17,7 +17,7 @@ class Keyboard
 public:
     void setup(KeyEventReceiver *receiver = nullptr);
 
-    void process();
+    bool process();
 
     bool setEventReceiver(KeyEventReceiver *receiver);
 };

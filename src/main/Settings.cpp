@@ -64,6 +64,9 @@ int8_t Settings::loadSettings(const char *file_name)
         {
             Serial.printf("Settings::loadSettings: failed to load file due to %s\n", e.c_str());
             document.clear();
+            file.close();
+            SPIFFS.end();
+            return -1;
         }
     }
     file.close();

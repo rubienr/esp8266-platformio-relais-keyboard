@@ -27,6 +27,6 @@ protected:
 
     String absolute_file_path;
 
-    StaticJsonDocument<3800> document{};
+    StaticJsonDocument<4050> document{};
 };
 

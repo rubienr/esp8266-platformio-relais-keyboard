@@ -4,7 +4,7 @@
 #include <Wire.h>
 
 ExpansionBoard::ExpansionBoard(uint8_t address, uint8_t chip) : m_address(address), m_chip(chip)
-{};
+{}
 
 void ExpansionBoard::setup(uint16_t output_pin_values)
 {

@@ -83,5 +83,5 @@ void RelaySettingsStorage::writeKeyRelayActions(const RelayState &a)
         writeKeyEventRelayAction(r, node.getOrAddMember(String(i++)));
 }
 
-RelaySettingsStorage::RelaySettingsStorage() : Settings("/key-relay-settings.json")
+RelaySettingsStorage::RelaySettingsStorage() : Settings("/conf/key_relay_conf.json")
 {}
