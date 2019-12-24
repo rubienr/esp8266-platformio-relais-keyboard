@@ -7,14 +7,14 @@
 
 void RelaySettingsStorage::storeRelayFlags(uint16_t flags)
 {
-    JsonVariant node = getDocument();
+    JsonVariant node = getDocumentRoot();
     node = node[relay::settings::names::RelayKeys::RELAY][relay::settings::names::RelayFlagsKeys::ACTIVATION_FLAGS];
     node.set(flags);
 }
 
 uint16_t RelaySettingsStorage::readRelayFlags()
 {
-    JsonVariant node = getDocument();
+    JsonVariant node = getDocumentRoot();
     return node[relay::settings::names::RelayKeys::RELAY][relay::settings::names::RelayFlagsKeys::ACTIVATION_FLAGS].as<__uint16_t>();
 }
 
@@ -67,7 +67,7 @@ void RelaySettingsStorage::writeKeyEventRelayAction(const RelayState::ElementTyp
 
 void RelaySettingsStorage::readKeyRelayActions(RelayState &a)
 {
-    JsonVariant node = getDocument();
+    JsonVariant node = getDocumentRoot();
     uint8_t i = 0;
 
     for (auto &r : a.key_code)
@@ -76,7 +76,7 @@ void RelaySettingsStorage::readKeyRelayActions(RelayState &a)
 
 void RelaySettingsStorage::writeKeyRelayActions(const RelayState &a)
 {
-    JsonVariant node = getDocument();
+    JsonVariant node = getDocumentRoot();
     uint8_t i = 0;
 
     for (const auto &r : a.key_code)

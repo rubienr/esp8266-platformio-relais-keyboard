@@ -33,5 +33,8 @@ void WifiConfigOrFallbackAccesspointManager::printConnection(const char *ssid, c
 {
     display.printf("WiFi: %s\n", ssid);
     display.printf("http://%s\n", address);
+
+    Serial.printf("WifiConfigOrFallbackAccesspointManager::printConnection WiFi: %s\n", ssid);
+    Serial.printf("WifiConfigOrFallbackAccesspointManager::printConnection http://%s\n", address);
 }
 

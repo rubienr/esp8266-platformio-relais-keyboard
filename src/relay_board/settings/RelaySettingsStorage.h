@@ -1,6 +1,6 @@
 #pragma once
 
-#include "main/Settings.h"
+#include "settings/Settings.h"
 #include <stdint.h>
 #include "RelayEventsActions.h"
 
@@ -8,7 +8,7 @@ class RelaySettingsStorage : public Settings
 {
 
 public:
-    using RelayState = KeyEventsRelaysAction;
+    using RelayState = KeyEventRelayAction;
 
     RelaySettingsStorage();
 

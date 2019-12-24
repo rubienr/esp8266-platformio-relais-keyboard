@@ -1,19 +1,21 @@
 <html>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
     <head>
-        <script type="text/javascript" src="/html/scripts.js"></script>
+        <link rel="stylesheet" type="text/css" href="/html/min-c.css">
+        <script type="text/javascript" src="/html/scripts-c.js"></script>
         <script language="JavaScript">
-            function init() {
-                loadJSON("/api/settings/relay/get", function(response) {
-                    console.log(response);
+            function fetchSettings() {
+                loadJson("/api/settings/relay/get", function (response) {
+                    console.log("request settings: " + response);
                     settings = JSON.parse(response);
-                    createLegend("legend");
-                    createNodesFromJson("settings");
+                    createTableLegend("legend");
+                    createTableFromSettings("settings");
                     loadDataFromJson();
                 });
-            };
+            }
 
-            init();
+            fetchSettings();
+
         </script>
     </head>
     <body>

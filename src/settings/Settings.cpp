@@ -10,7 +10,7 @@ void Settings::setup()
 
 int8_t Settings::saveSettings()
 {
-    return saveSettings(absolute_file_path.c_str(), getDocument());
+    return saveSettings(absolute_file_path.c_str(), getDocumentRoot());
 }
 
 int8_t Settings::saveSettings(const char *file_name, JsonVariant config)
@@ -75,9 +75,14 @@ int8_t Settings::loadSettings(const char *file_name)
     return 0;
 }
 
-JsonVariant Settings::getDocument()
+JsonVariant Settings::getDocumentRoot()
 {
     return document.as<JsonVariant>();
+}
+
+JsonDocument &Settings::getDocument()
+{
+    return document;
 }
 
 void Settings::print() const

@@ -9,12 +9,11 @@
 #include "keyboard/KeyEventReceiver.h"
 #include "keyboard/Keyboard.h"
 
-class KeyEventHandler : public KeyEventReceiver
-{
+class KeyEventHandler : public KeyEventReceiver {
     OperatingMode &operating_mode;
     StandbyOfficer &standby_officer;
     Display &display;
-    KeyEventsRelaysAction &relay_settings;
+    KeyEventRelayAction &relay_settings;
     RelaysBoard &relays_board;
 
 public:
@@ -23,17 +22,15 @@ public:
             OperatingMode &operating_mode,
             StandbyOfficer &standby_officer,
             Display &display,
-            KeyEventsRelaysAction &relay_settings,
+            KeyEventRelayAction &relay_settings,
             RelaysBoard &relays_board) :
             operating_mode(operating_mode),
             standby_officer(standby_officer),
             display(display),
             relay_settings(relay_settings),
-            relays_board(relays_board)
-    {}
+            relays_board(relays_board) {}
 
-    bool take(KeyEvent e) override
-    {
+    bool take(KeyEvent e) override {
         digitalWrite(LED_BUILTIN, LOW);
         display.reset();
         display.printf("KEY %d \n", std::underlying_type<KeyEvent::Key>::type(e.key));
@@ -54,13 +51,11 @@ public:
         standby_officer.reset();
 
 
-        if (!consumed && e.type == KeyEvent::Type::Repeated)
-        {
+        if (!consumed && e.type == KeyEvent::Type::Repeated) {
             const uint8_t long_press = 8;
             const uint8_t extra_long_press = 2 * long_press;
 
-            switch (e.key)
-            {
+            switch (e.key) {
                 case KeyEvent::Key::Key0:
                     break;
                 case KeyEvent::Key::Key1:
@@ -78,8 +73,7 @@ public:
                 case KeyEvent::Key::Key7:
                     break;
                 case KeyEvent::Key::Key8:
-                    if (e.repeated >= extra_long_press && operating_mode == OperatingMode::Mode::Normal)
-                    {
+                    if (e.repeated >= extra_long_press && operating_mode == OperatingMode::Mode::Normal) {
                         operating_mode = OperatingMode::Mode::SwitchToWifi;
                         consumed = true;
 
@@ -101,15 +95,14 @@ public:
             }
         }
 
-        if (!consumed && ((e.type == KeyEvent::Type::Pressed) || (e.type == KeyEvent::Type::DoublePressed)))
-        {
+        if (!consumed && ((e.type == KeyEvent::Type::Pressed) || (e.type == KeyEvent::Type::DoublePressed) ||
+                          (e.type == KeyEvent::Type::Repeated))) {
             uint8_t key = KeyEvent::uint8FromKey(e.key);
             uint8_t event = KeyEvent::uint8FromKeyType(KeyEvent::Type::Pressed);
             const auto &actions = relay_settings.key_code[key].event_type[event].relay_actuation;
             relays_board.actuate(actions);
             consumed = true;
-        } else
-        {
+        } else {
             uint8_t key = KeyEvent::uint8FromKey(e.key);
             uint8_t event = KeyEvent::uint8FromKeyType(KeyEvent::Type::Released);
             const auto &actions = relay_settings.key_code[key].event_type[event].relay_actuation;

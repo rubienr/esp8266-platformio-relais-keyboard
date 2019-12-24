@@ -8,7 +8,7 @@
 #include "relay_board/settings/RelayEventsActionHelper.h"
 #include "relay_board/settings/RelaySettingsStorage.h"
 #include "wifi/WifiConfigOrFallbackAccesspointManager.h"
-#include "main/RelayBoardWebService.h"
+#include "main/StatusAndConfigurationWebService.h"
 
 struct Resources
 {
@@ -20,9 +20,9 @@ struct Resources
             while (!Serial) delay(10);
             Serial.printf("\n\n\n");
 
+            wifi_status_led_uninstall();
             pinMode(LED_BUILTIN, OUTPUT);
             digitalWrite(LED_BUILTIN, HIGH);
-            wifi_status_led_uninstall();
         }
     } early_init;
 
@@ -34,9 +34,9 @@ struct Resources
     ExpansionBoard io_expander;
     RelaysBoard relays_board{io_expander};
     StandbyOfficer standby_officer{30};
-    KeyEventsRelaysAction relays_actions;
+    KeyEventRelayAction relays_actions;
     KeyEventHandler event_handler{operating_mode, standby_officer, display, relays_actions, relays_board};
-    RelayBoardWebService web_service{settings};
+    StatusAndConfigurationWebService web_service{settings, relays_actions};
 
     void setup()
     {
@@ -47,12 +47,6 @@ struct Resources
 
             // --- load last state
             settings.readKeyRelayActions(relays_actions);
-
-            // TODO RR - remove defaults
-            //relays_actions.setDefaults(KeyEvent::Type::Pressed, Relay::Actuation::Activate);
-            //relays_actions.setDefaults(KeyEvent::Type::Released, Relay::Actuation::Release);
-            //settings.writeKeyRelayActions(relays_actions);
-            // TODO END
 
             // --- informational output
             KeyEventsRelaysActionHelper<>(relays_actions).print();

@@ -104,4 +104,4 @@ add_custom_target(
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/main/ConfigurationWebService.cpp src/main/ConfigurationWebService.h src/main/StatusBar.cpp src/main/StatusBar.h src/main/RelayBoardWebService.cpp src/main/RelayBoardWebService.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST})

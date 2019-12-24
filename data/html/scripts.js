@@ -1,99 +1,38 @@
-var settings = {};
+/*jshint globalstrict: true*/
+"use strict";
+var settings = {
+    /*"0": {
+        "0": [0, 1, 2, 3, 0, 0, 0, 0],
+        "1": [0, 3, 0, 0, 0, 0, 0, 0]
+    },
+    ...
+    "12": {
+        "0": [0, 1, 0, 0, 0, 0, 0, 0],
+        "1": [0, 0, 0, 0, 0, 0, 0, 0]
+    }*/
+};
 
-/* settings = {
-     "0": {
-         "0": [0, 1, 2, 3, 0, 0, 0, 0],
-         "1": [0, 3, 0, 0, 0, 0, 0, 0]
-     },
-     "1": {
-         "0": [0, 1, 0, 0, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "2": {
-         "0": [0, 0, 1, 0, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "3": {
-         "0": [0, 0, 0, 1, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "4": {
-         "0": [0, 0, 0, 0, 1, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "5": {
-         "0": [0, 0, 0, 0, 0, 1, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "6": {
-         "0": [0, 0, 0, 0, 0, 0, 1, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "7": {
-         "0": [0, 0, 0, 0, 0, 0, 0, 1],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "8": {
-         "0": [0, 0, 0, 0, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "9": {
-         "0": [0, 0, 0, 0, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "10": {
-         "0": [0, 0, 0, 0, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "11": {
-         "0": [0, 0, 0, 0, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     },
-     "12": {
-         "0": [0, 0, 0, 0, 0, 0, 0, 0],
-         "1": [0, 0, 0, 0, 0, 0, 0, 0]
-     }
- };*/
-
-relay_symbols = {
+var relay_symbols = {
     toggle: "♺",
     on: "☑",
     off: "☒",
     untouched: "☐"
 };
 
-key_event_symbols = {
+var key_event_symbols = {
     pressed: "↓",
-    released: "↑",
+    released: "↑"
 };
 
-event_type_dict = {};
+var event_type_dict = {};
 event_type_dict[0] = key_event_symbols.pressed;
 event_type_dict[1] = key_event_symbols.released;
 
-relay_actuation_dict = {};
+var relay_actuation_dict = {};
 relay_actuation_dict[0] = {id: 0, symbol: relay_symbols.off, alt: "deactivate"};
 relay_actuation_dict[1] = {id: 1, symbol: relay_symbols.on, alt: "activate"};
 relay_actuation_dict[2] = {id: 2, symbol: relay_symbols.toggle, alt: "toggle"};
 relay_actuation_dict[3] = {id: 3, symbol: relay_symbols.untouched, alt: "leave untouched"};
-
-
-function createLegend(id) {
-    var r = relay_symbols;
-    var k = key_event_symbols;
-
-    var legend =
-        r.on + " ... On <br />" +
-        r.off + " ... Off <br />" +
-        r.toggle + " ... Toggle <br />" +
-        r.untouched + " ... Unchanged <br />" +
-        "<br />" +
-        k.pressed + " ... Button Pressed <br />" +
-        k.released + " ... Button Released <br />";
-
-    var root = document.getElementById(id);
-    root.innerHTML = legend;
-}
 
 function forEachRelaySetting(callback) {
     var path = "";
@@ -107,9 +46,9 @@ function forEachRelaySetting(callback) {
 
             for (var relay_id in relay_states) {
                 path += "." + relay_id;
-                var relay_state = relay_states[relay_id]
+                var relay_state = relay_states[relay_id];
 
-                callback(path + "." + relay_state)
+                callback(path + "." + relay_state);
 
                 path = path.slice(0, path.lastIndexOf("."));
             }
@@ -128,33 +67,63 @@ function loadDataFromJson() {
     forEachRelaySetting(setRadiobuttonEnabled);
 }
 
-function setColumn(row, column, event_type, value) {
+function setRelayTableValues(key_code, event_type, relay_id, actuation_value) {
     var row_class = "";
-    if (row != -1)
-        row_class = " key_code" + row;
-
-    var col_class = "";
-    if (column != -1)
-        col_class = " relay_id" + column;
+    if (key_code != -1)
+        row_class = " key_code" + key_code;
 
     var event_class = "";
     if (event_type != -1)
         event_class = " event_type" + event_type;
 
-    var classes = row_class + col_class + " " + event_class + " value" + value;
-    console.log("classes: " + classes);
+    var col_class = "";
+    if (relay_id != -1)
+        col_class = " relay_id" + relay_id;
+
+    var classes = row_class + col_class + " " + event_class + " value" + actuation_value;
     var buttons = document.getElementsByClassName(classes);
 
     for (var button_idx in buttons) {
-        var button = buttons[button_idx]
+        // update table
+        var button = buttons[button_idx];
         button.checked = true;
+        // update matrix
+        saveRelayValueByRadioIdToMatrix(button.id, button.value);
     }
 }
 
+function saveRelayValueByRadioIdToMatrix(path, value) {
+    //var [key_code, event_type, relay_id] = path.split(".");
+    var args = path.split(".");
+    var key_code = args[0];
+    var event_type = args[1];
+    var relay_id = args[2];
+
+    //console.log("set settings[" + key_code + "][" + event_type + "][" + relay_id + "] to " + value);
+    settings[key_code][event_type][relay_id] = parseInt(value); // saves " in Json and thus memory while parsing
+    document.getElementById("save_status").innerHTML = "";
+}
+
+function saveSettingsToDevice() {
+    console.log("save settings: " + settings);
+    sendJson("/api/settings/relay/save", settings, function (response) {
+        var status_field = document.getElementById("save_status");
+        var response_object = JSON.parse(response);
+        if (response_object["return"] == true || response_object["return"] == "true") {
+            status_field.innerHTML = "saved";
+        } else {
+            status_field.innerHTML = response_object["reason"];
+        }
+    });
+}
+
 function addSaveButton(node, text, alternative_text) {
+    if (text == null) text = "💾";
+    if (alternative_text == null) alternative_text = "save settings";
     var button = node.appendChild(document.createElement("button"));
+
     button.setAttribute("type", "button");
-    button.setAttribute("onClick", "store()");
+    button.setAttribute("onClick", "saveSettingsToDevice()");
     button.innerHTML = text;
     button.setAttribute("alt", alternative_text);
 }
@@ -162,16 +131,33 @@ function addSaveButton(node, text, alternative_text) {
 function addShortcutButton(node, text, row, column, event_type, value, alternative_text) {
     var button = node.appendChild(document.createElement("button"));
     button.setAttribute("type", "button");
-    button.setAttribute("onClick", "setColumn(" +
+    button.setAttribute("onClick", "setRelayTableValues(" +
         row + "," +
-        column + "," +
         event_type + "," +
+        column + "," +
         value + ")");
     button.innerHTML = text;
     button.setAttribute("alt", alternative_text);
 }
 
-function createNodesFromJson(id) {
+function createTableLegend(id) {
+    var r = relay_symbols;
+    var k = key_event_symbols;
+
+    var legend =
+        r.on + " ... On <br />" +
+        r.off + " ... Off <br />" +
+        r.toggle + " ... Toggle <br />" +
+        r.untouched + " ... Unchanged <br />" +
+        "<br />" +
+        k.pressed + " ... Button Pressed <br />" +
+        k.released + " ... Button Released <br />";
+
+    var root = document.getElementById(id);
+    root.innerHTML = legend;
+}
+
+function createTableFromSettings(id) {
     var root = document.getElementById(id);
 
     var table = root.appendChild(document.createElement("table"));
@@ -189,9 +175,11 @@ function createNodesFromJson(id) {
             thd.innerHTML = "Relay " + idx;
         }
 
-        // add save button
+        // add save button and status div
         thd = table_header.appendChild(document.createElement("td"));
-        addSaveButton(thd, "save", "save settings");
+        addSaveButton(thd);
+        var save_status = thd.appendChild(document.createElement("div"));
+        save_status.setAttribute("id", "save_status");
     }
 
     var table_body = table.appendChild(document.createElement("tbody"));
@@ -206,7 +194,7 @@ function createNodesFromJson(id) {
         for (var id in settings[0][0]) {
             ths = shortcuts.appendChild(document.createElement("td"));
             for (var idx in relay_actuation_dict) {
-                var attrs = relay_actuation_dict[idx]
+                var attrs = relay_actuation_dict[idx];
                 addShortcutButton(ths, attrs.symbol, -1, id, -1, attrs.id, attrs.alt);
             }
         }
@@ -214,7 +202,7 @@ function createNodesFromJson(id) {
         // table shortcuts
         ths = shortcuts.appendChild(document.createElement("td"));
         for (var idx in relay_actuation_dict) {
-            var attrs = relay_actuation_dict[idx]
+            var attrs = relay_actuation_dict[idx];
             addShortcutButton(ths, attrs.symbol, -1, -1, -1, attrs.id, attrs.alt);
         }
     }
@@ -230,7 +218,7 @@ function createNodesFromJson(id) {
         table_row.setAttribute("id", path);
         var key_name = table_row.appendChild(document.createElement("td"));
         key_name.setAttribute("rowspan", "2");
-        key_name.innerHTML = /*"Key " +*/ key_code;
+        key_name.innerHTML = key_code;
 
         var key_event_type_count = 0;
         for (var key_event_type_id in key_event_types) {
@@ -250,7 +238,7 @@ function createNodesFromJson(id) {
                 path += "." + relay_id;
                 var class_relay_id = "relay_id" + relay_id;
 
-                var relay = table_row.appendChild(document.createElement("td"))
+                var relay = table_row.appendChild(document.createElement("td"));
                 relay.setAttribute("id", path);
 
                 // create radio buttons
@@ -264,6 +252,7 @@ function createNodesFromJson(id) {
                     input.setAttribute("id", path + "." + input_attrs.id);
                     input.setAttribute("value", /*path + "." +*/ input_attrs.id);
                     input.setAttribute("class", class_keycode + " " + class_event_type + " " + class_relay_id + " value" + input_attrs.id);
+                    input.setAttribute("onClick", "saveRelayValueByRadioIdToMatrix(\"" + path + "\", " + input_attrs.id + ")");
                 }
                 path = path.slice(0, path.lastIndexOf("."));
             }
@@ -272,7 +261,7 @@ function createNodesFromJson(id) {
                 var shortcuts = table_row.appendChild(document.createElement("td"));
 
                 for (var idx in relay_actuation_dict) {
-                    var attrs = relay_actuation_dict[idx]
+                    var attrs = relay_actuation_dict[idx];
                     addShortcutButton(shortcuts, attrs.symbol, key_code, -1, key_event_type_id, attrs.id, attrs.alt);
                 }
             }
@@ -283,7 +272,7 @@ function createNodesFromJson(id) {
     }
 }
 
-function writeDataToJson() {
+function updateSettingsFromTableData() {
     function write_to_json(id) {
         id = id.slice(0, id.lastIndexOf("."));
         var relay_setting = document.querySelector("input[name='" + id + "']:checked");
@@ -304,22 +293,26 @@ function writeDataToJson() {
     forEachRelaySetting(write_to_json);
 }
 
-function store() {
-    writeDataToJson();
-    // send to µC
-}
-
-
-function loadJSON(url, callback) {
-
+function loadJson(url, callback) {
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
-    xobj.open('GET', url, true); // Replace 'my_data' with the path to your file
+    xobj.open('GET', url, true);
     xobj.onreadystatechange = function () {
         if (xobj.readyState == 4 && xobj.status == "200") {
-            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-            callback(xobj.responseText);
+            callback(this.responseText);
         }
     };
     xobj.send(null);
+}
+
+function sendJson(url, json, callback) {
+    var xobj = new XMLHttpRequest();
+    xobj.open("POST", url, true);
+    xobj.setRequestHeader("Content-Type", "application/json");
+    xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4 && xobj.status == 200) {
+            callback(this.responseText);
+        }
+    };
+    xobj.send(JSON.stringify(json));
 }

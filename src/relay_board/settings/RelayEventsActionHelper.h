@@ -73,7 +73,7 @@ struct EventTypeRelaysActionHelper : public Wrap<const Impl &>
     }
 };
 
-template<typename Impl = KeyEventsRelaysAction>
+template<typename Impl = KeyEventRelayAction>
 struct KeyEventsRelaysActionHelper : public Wrap<const Impl &>
 {
     using Wrap<const Impl &>::wrapped;

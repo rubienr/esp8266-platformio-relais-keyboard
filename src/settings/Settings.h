@@ -13,7 +13,9 @@ struct Settings
 
     int8_t saveSettings();
 
-    JsonVariant getDocument();
+    JsonVariant getDocumentRoot();
+
+    JsonDocument &getDocument();
 
     void print() const;
 
@@ -27,6 +29,8 @@ protected:
 
     String absolute_file_path;
 
-    StaticJsonDocument<4050> document{};
+    //StaticJsonDocument<4050> document{};
+    DynamicJsonDocument document{4050};
+
 };
 

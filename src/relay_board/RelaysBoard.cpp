@@ -1,6 +1,6 @@
 #include "RelaysBoard.h"
 
-void RelaysBoard::actuate(const KeyEventsRelaysAction::ElementType::ElementType::ArrayType &action)
+void RelaysBoard::actuate(const KeyEventRelayAction::ElementType::ElementType::ArrayType &action)
 {
     Serial.printf("RelayBoardTemplate::actuate: [");
     String delimiter{""};
