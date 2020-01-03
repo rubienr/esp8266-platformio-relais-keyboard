@@ -3,17 +3,18 @@
 #include <Arduino.h>
 #include <display/Display.h>
 #include <relay_board/RelaysBoard.h>
-#include <relay_board/settings/RelaySettingsStorage.h>
+#include <relay_board/settings/KeyRelaySettingsStorage.h>
 #include "OperatingMode.h"
 #include "powersafe/StandbyOfficer.h"
 #include "keyboard/KeyEventReceiver.h"
 #include "keyboard/Keyboard.h"
+#include "pin_utils.h"
 
 class KeyEventHandler : public KeyEventReceiver {
     OperatingMode &operating_mode;
     StandbyOfficer &standby_officer;
     Display &display;
-    KeyEventRelayAction &relay_settings;
+    KeyRelaySettings &relay_settings;
     RelaysBoard &relays_board;
 
 public:
@@ -22,7 +23,7 @@ public:
             OperatingMode &operating_mode,
             StandbyOfficer &standby_officer,
             Display &display,
-            KeyEventRelayAction &relay_settings,
+            KeyRelaySettings &relay_settings,
             RelaysBoard &relays_board) :
             operating_mode(operating_mode),
             standby_officer(standby_officer),
@@ -31,7 +32,7 @@ public:
             relays_board(relays_board) {}
 
     bool take(KeyEvent e) override {
-        digitalWrite(LED_BUILTIN, LOW);
+        ScopedPin(LED_BUILTIN, LOW, HIGH);
         display.reset();
         display.printf("KEY %d \n", std::underlying_type<KeyEvent::Key>::type(e.key));
         display.printf("PRE %d \n", (e.type == KeyEvent::Type::Pressed));
@@ -95,22 +96,14 @@ public:
             }
         }
 
-        if (!consumed && ((e.type == KeyEvent::Type::Pressed) || (e.type == KeyEvent::Type::DoublePressed) ||
-                          (e.type == KeyEvent::Type::Repeated))) {
+        if (!consumed && ((e.type == KeyEvent::Type::Pressed) || (e.type == KeyEvent::Type::Released))) {
             uint8_t key = KeyEvent::uint8FromKey(e.key);
-            uint8_t event = KeyEvent::uint8FromKeyType(KeyEvent::Type::Pressed);
-            const auto &actions = relay_settings.key_code[key].event_type[event].relay_actuation;
-            relays_board.actuate(actions);
-            consumed = true;
-        } else {
-            uint8_t key = KeyEvent::uint8FromKey(e.key);
-            uint8_t event = KeyEvent::uint8FromKeyType(KeyEvent::Type::Released);
+            uint8_t event = KeyEvent::uint8FromKeyType(e.type);
             const auto &actions = relay_settings.key_code[key].event_type[event].relay_actuation;
             relays_board.actuate(actions);
             consumed = true;
         }
 
-        digitalWrite(LED_BUILTIN, HIGH);
         return consumed;
     }
 };

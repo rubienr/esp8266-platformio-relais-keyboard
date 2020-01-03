@@ -1,12 +1,12 @@
 #pragma once
 
-#include <relay_board/settings/RelaySettingsStorage.h>
+#include <relay_board/settings/KeyRelaySettingsStorage.h>
 #include "web/WebService.h"
 
 class StatusAndConfigurationWebService : public WebService {
 
 public:
-    explicit StatusAndConfigurationWebService(RelaySettingsStorage &settings, KeyEventRelayAction &relays_actions);
+    explicit StatusAndConfigurationWebService(KeyRelaySettingsStorage &settings, KeyRelaySettings &relays_actions);
 
     void setup();
 
@@ -15,8 +15,8 @@ public:
     void saveRelaySettings();
 
 protected:
-    RelaySettingsStorage &settings;
-    KeyEventRelayAction &relays_actions;
+    KeyRelaySettingsStorage &settings;
+    KeyRelaySettings &relays_actions;
 
     void getRelaySettingsHtml();
 

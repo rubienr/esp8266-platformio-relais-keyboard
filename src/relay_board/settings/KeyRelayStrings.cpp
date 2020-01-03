@@ -1,22 +1,17 @@
-#include "RelayStrings.h"
+#include "KeyRelayStrings.h"
 
-namespace relay
-{
-    namespace settings
-    {
-        namespace names
-        {
+namespace relay {
+    namespace settings {
+        namespace names {
             const char *RelayFlagsKeys::ACTIVATION_FLAGS = "activation_flags";
 
             const char *RelayKeys::RELAY = "relay_actuation";
 
-            namespace KeyEventRelaysAction
-            {
+            namespace KeyEventRelaysAction {
                 char SCOPE[]{"KeyEventRelaysAction"};
                 char KEY_CODE[]{"key_code"};
 
-                namespace RelaysAction
-                {
+                namespace RelaysAction {
                     char SCOPE[]{"RelaysAction"};
                     char KEY_EVENT_TYPE[]{"event_type"};
                     char RELAYS_ACTION[]{"relay_actuation"};

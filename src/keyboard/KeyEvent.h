@@ -22,6 +22,11 @@ struct KeyEvent
         return static_cast<UnterlyingTypeofKey>(Key::LastEnumeration);
     }
 
+    constexpr static uint8_t keysCount()
+    {
+        return keyEnumerationsCount() - 1;
+    }
+
     constexpr static uint8_t keyTypeEnumerationsCount()
     {
         return static_cast<UnterlyingTypeofType>(Type::LastEnumeration);

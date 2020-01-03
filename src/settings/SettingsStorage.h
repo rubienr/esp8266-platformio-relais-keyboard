@@ -2,10 +2,10 @@
 
 #include <ArduinoJson.h>
 
-struct Settings
+struct SettingsStorage
 {
 
-    explicit Settings(const String &file_path = "/settings.json");
+    explicit SettingsStorage(const String &file_path = "/settings.json");
 
     void setup();
 
@@ -13,7 +13,8 @@ struct Settings
 
     int8_t saveSettings();
 
-    JsonVariant getDocumentRoot();
+
+    JsonVariant getDocumentRoot() ;
 
     JsonDocument &getDocument();
 
@@ -23,14 +24,15 @@ struct Settings
 
 protected:
 
-    int8_t loadSettings(const char *file_name);
+    virtual int8_t loadSettings(const char *file_name);
 
     int8_t saveSettings(const char *file_name, JsonVariant config);
 
     String absolute_file_path;
 
-    //StaticJsonDocument<4050> document{};
-    DynamicJsonDocument document{4050};
+    DynamicJsonDocument document{4500};
+
+    const JsonVariant getDocumentRoot() const;
 
 };
 

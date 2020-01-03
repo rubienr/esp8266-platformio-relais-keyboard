@@ -1,30 +1,23 @@
 #pragma once
 
-#include "RelayEventsActions.h"
+#include "KeyRelaySettings.h"
 #include <inttypes.h>
 
-namespace relay
-{
-    namespace settings
-    {
-        namespace names
-        {
-            struct RelayFlagsKeys
-            {
+namespace relay {
+    namespace settings {
+        namespace names {
+            struct RelayFlagsKeys {
                 static const char *ACTIVATION_FLAGS;
             };
 
-            struct RelayKeys
-            {
+            struct RelayKeys {
                 static const char *RELAY;
             };
-            namespace KeyEventRelaysAction
-            {
+            namespace KeyEventRelaysAction {
                 extern char SCOPE[];
                 extern char KEY_CODE[];
 
-                namespace RelaysAction
-                {
+                namespace RelaysAction {
                     extern char SCOPE[];
                     extern char KEY_EVENT_TYPE[];
                     extern char RELAYS_ACTION[];

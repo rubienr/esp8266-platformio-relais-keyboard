@@ -9,17 +9,35 @@
                     console.log("request settings: " + response);
                     settings = JSON.parse(response);
                     createTableLegend("legend");
-                    createTableFromSettings("settings");
-                    loadDataFromJson();
+                    createTableFromSettings("relays_logic");
+
+                    createNamesListingFromSettings("keys_name", "k");
+                    createNamesListingFromSettings("relays_name", "r");
+
+                    createPersistenceEnabledFromSettings("persistence");
+
+                    loadTableFromSettings();
+                    loadNamesListingsFromSettings();
+                    loadPersistenceEnabledFromSettings();
+
                 });
             }
-
             fetchSettings();
 
         </script>
     </head>
     <body>
+        <h1>Settings</h1>
+        <h2>Relais Logic</h2>
         <div id="legend"></div>
-        <div id="settings"></div>
+        <div id="relays_logic"></div>
+
+        <h2>Keys Name</h2>
+        <div id="keys_name"></div>
+        <h2>Relays Name</h2>
+        <div id="relays_name"></div>
+
+        <h2>Persistence</h2>
+        <div id="persistence"></div>
     </body>
 </html>

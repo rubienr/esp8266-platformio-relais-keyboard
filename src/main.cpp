@@ -5,8 +5,8 @@
 #include "display/Display.h"
 #include "main/OperatingMode.h"
 #include "expansion_board/ExpansionBoard.h"
-#include "relay_board/settings/RelayEventsActionHelper.h"
-#include "relay_board/settings/RelaySettingsStorage.h"
+#include "relay_board/settings/KeyRelaySettingsHelper.h"
+#include "relay_board/settings/KeyRelaySettingsStorage.h"
 #include "wifi/WifiConfigOrFallbackAccesspointManager.h"
 #include "main/StatusAndConfigurationWebService.h"
 
@@ -30,11 +30,11 @@ struct Resources
     Keyboard keyboard;
     Display display;
     StatusBar status_bar{operating_mode, display};
-    RelaySettingsStorage settings;
+    KeyRelaySettingsStorage settings;
     ExpansionBoard io_expander;
     RelaysBoard relays_board{io_expander};
     StandbyOfficer standby_officer{30};
-    KeyEventRelayAction relays_actions;
+    KeyRelaySettings relays_actions{};
     KeyEventHandler event_handler{operating_mode, standby_officer, display, relays_actions, relays_board};
     StatusAndConfigurationWebService web_service{settings, relays_actions};
 
@@ -43,23 +43,23 @@ struct Resources
         // --- load settings
         [&]()
         {
-            settings.setup();
-
             // --- load last state
-            settings.readKeyRelayActions(relays_actions);
+            settings.setup();
+            settings.writeKeyRelayActions(relays_actions);
 
             // --- informational output
-            KeyEventsRelaysActionHelper<>(relays_actions).print();
+            KeyEventsRelaysActionHelper<KeyRelaySettings>(relays_actions).print();
+
             settings.print();
             settings.printMemoryUsage();
+            //settings.resetDocument();
         }();
 
         // --- restore physical state
         [&]()
         {
             // --- restore last stored state
-            io_expander.setup(settings.readRelayFlags());
-
+            io_expander.setup(relays_actions.relay_flags);
             relays_board.setup();
         }();
 
