@@ -2,12 +2,13 @@
 #include <WiFiManager.h>
 #include <main/KeyEventHandler.h>
 #include <main/StatusBar.h>
-#include "display/Display.h"
+#include <Display.h>
+#include <Countdown.h>
 #include "main/OperatingMode.h"
-#include "expansion_board/ExpansionBoard.h"
-#include "relay_board/settings/KeyRelaySettingsHelper.h"
-#include "relay_board/settings/KeyRelaySettingsStorage.h"
-#include "wifi/WifiConfigOrFallbackAccesspointManager.h"
+#include <ExpansionBoard.h>
+#include <KeyEventsRelaysStateHelper.h>
+#include <KeysEventsRelaysStateStorageTemplate.h>
+#include <WifiConfigOrFallbackAccesspointManager.h>
 #include "main/StatusAndConfigurationWebService.h"
 
 struct Resources
@@ -19,8 +20,9 @@ struct Resources
             Serial.begin(230400);
             while (!Serial) delay(10);
             Serial.printf("\n\n\n");
-
+#if defined(ESP8266)
             wifi_status_led_uninstall();
+#endif
             pinMode(LED_BUILTIN, OUTPUT);
             digitalWrite(LED_BUILTIN, HIGH);
         }
@@ -30,36 +32,36 @@ struct Resources
     Keyboard keyboard;
     Display display;
     StatusBar status_bar{operating_mode, display};
-    KeyRelaySettingsStorage settings;
+    KeysEventsRelaysStateStorage settings;
     ExpansionBoard io_expander;
     RelaysBoard relays_board{io_expander};
-    StandbyOfficer standby_officer{30};
-    KeyRelaySettings relays_actions{};
-    KeyEventHandler event_handler{operating_mode, standby_officer, display, relays_actions, relays_board};
-    StatusAndConfigurationWebService web_service{settings, relays_actions};
+    Countdown standby_officer{30};
+    KeysEventsRelaysState relays_state{};
+    KeyEventHandler event_handler{operating_mode, standby_officer, display, relays_state, relays_board};
+    StatusAndConfigurationWebService web_service{settings, relays_state};
 
     void setup()
     {
-        // --- load settings
+        // --- load relayboardsettings
         [&]()
         {
             // --- load last state
             settings.setup();
-            settings.writeKeyRelayActions(relays_actions);
+            settings.writeKeyRelayActions(relays_state);
 
             // --- informational output
-            KeyEventsRelaysActionHelper<KeyRelaySettings>(relays_actions).print();
+            KeyEventsRelaysStateHelper<KeysEventsRelaysState>(relays_state).print();
 
             settings.print();
             settings.printMemoryUsage();
-            //settings.resetDocument();
+            //relayboardsettings.resetDocument();
         }();
 
         // --- restore physical state
         [&]()
         {
             // --- restore last stored state
-            io_expander.setup(relays_actions.relay_flags);
+            io_expander.setup(relays_state.relay_flags);
             relays_board.setup();
         }();
 
@@ -111,7 +113,7 @@ struct Resources
 
     void processWifi()
     {
-        if (web_service.handleClient())
+        if (web_service.process())
         {
             status_bar.update();
         }
@@ -123,4 +125,6 @@ void setup()
 { r.setup(); }
 
 void loop()
-{ r.process(); }
+{ r.process();
+
+}

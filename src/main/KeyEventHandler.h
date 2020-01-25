@@ -1,20 +1,22 @@
 #pragma once
 
+#include "static_settings.h"
 #include <Arduino.h>
-#include <display/Display.h>
-#include <relay_board/RelaysBoard.h>
-#include <relay_board/settings/KeyRelaySettingsStorage.h>
+#include <Display.h>
+#include <Countdown.h>
+#include <RelaysBoardTemplate.h>
+#include <KeysEventsRelaysStateStorageTemplate.h>
 #include "OperatingMode.h"
-#include "powersafe/StandbyOfficer.h"
-#include "keyboard/KeyEventReceiver.h"
-#include "keyboard/Keyboard.h"
-#include "pin_utils.h"
+#include "KeyEventReceiver.h"
+#include "Keyboard.h"
+#include <pinutils.h>
+
 
 class KeyEventHandler : public KeyEventReceiver {
     OperatingMode &operating_mode;
     StandbyOfficer &standby_officer;
     Display &display;
-    KeyRelaySettings &relay_settings;
+    KeysEventsRelaysState &relay_settings;
     RelaysBoard &relays_board;
 
 public:
@@ -23,7 +25,7 @@ public:
             OperatingMode &operating_mode,
             StandbyOfficer &standby_officer,
             Display &display,
-            KeyRelaySettings &relay_settings,
+            KeysEventsRelaysState &relay_settings,
             RelaysBoard &relays_board) :
             operating_mode(operating_mode),
             standby_officer(standby_officer),
@@ -32,7 +34,7 @@ public:
             relays_board(relays_board) {}
 
     bool take(KeyEvent e) override {
-        ScopedPin(LED_BUILTIN, LOW, HIGH);
+        ScopedPin(LED_BUILTIN, LOW);
         display.reset();
         display.printf("KEY %d \n", std::underlying_type<KeyEvent::Key>::type(e.key));
         display.printf("PRE %d \n", (e.type == KeyEvent::Type::Pressed));
@@ -46,7 +48,8 @@ public:
         Serial.print(" type=");
         Serial.print(std::underlying_type<KeyEvent::Type>::type(e.type));
         Serial.print(" repeated=");
-        Serial.println(e.repeated);*/
+        Serial.println(e.repeated);
+*/
 
         bool consumed = false;
         standby_officer.reset();

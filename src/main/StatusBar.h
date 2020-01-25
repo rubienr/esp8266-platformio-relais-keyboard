@@ -1,8 +1,12 @@
 #pragma once
 
-#include <display/Display.h>
+#include <Display.h>
 #include "OperatingMode.h"
+#if defined(ESP8266)
 #include <avr/pgmspace.h>
+#elif defined (ESP32)
+#include <pgmspace.h>
+#endif
 
 struct StatusBar
 {

@@ -3,28 +3,32 @@
 #include <StreamUtils.h>
 #include <FS.h>
 
-StatusAndConfigurationWebService::StatusAndConfigurationWebService(KeyRelaySettingsStorage &settings, KeyRelaySettings &relays_actions) : settings(
-        settings), relays_actions(relays_actions) {
+#if defined(ESP32)
+#include <SPIFFS.h>
+#endif
+
+StatusAndConfigurationWebService::StatusAndConfigurationWebService(KeysEventsRelaysStateStorage &relays_state_storage, KeysEventsRelaysState &relays_state) : relays_state_storage(
+        relays_state_storage), relays_state(relays_state) {
     extra_post_html += "  <br/>";
-    //extra_post_html += "  <a href=/api/get>/api/settings/relay/get</a>get relay configuration<br/>";
-    extra_post_html += "  <a href=/api/settings/relay/save>/api/settings/relay/save</a><br/>";
-    extra_post_html += "  <a href=/settings/relay>Configure Relays</a><br/>";
+    //extra_post_html += "  <a href=/api/get>/api/relayboardsettings/relay/get</a>get relay configuration<br/>";
+    extra_post_html += "  <a href=/api/relayboardsettings/relay/save>/api/relayboardsettings/relay/save</a><br/>";
+    extra_post_html += "  <a href=/relayboardsettings/relay>Configure Relays</a><br/>";
 
 }
 
 void StatusAndConfigurationWebService::setup() {
     WebService::setup();
 
-    on("/settings/relay", [&]() {
-        Serial.println("WebService::on: /settings/relay/");
+    on("/relayboardsettings/relay", [&]() {
+        Serial.println("WebService::on: /relayboardsettings/relay/");
         getRelaySettingsHtml(); });
 
-    on("/api/settings/relay/get", [&]() {
-        Serial.println("WebService::on: /api/settings/relay/get");
+    on("/api/relayboardsettings/relay/get", [&]() {
+        Serial.println("WebService::on: /api/relayboardsettings/relay/get");
         getRelaySettings(); });
 
-    on("/api/settings/relay/save", [&]() {
-        Serial.println("WebService::on: /api/settings/relay/save");
+    on("/api/relayboardsettings/relay/save", [&]() {
+        Serial.println("WebService::on: /api/relayboardsettings/relay/save");
         saveRelaySettings(); });
 
     on("/html/scripts.js", [&]() {
@@ -47,12 +51,12 @@ void StatusAndConfigurationWebService::setup() {
 void StatusAndConfigurationWebService::getRelaySettings() {
     String json;
 
-    //settings.resetDocument();
-    settings.loadKeyRelayActions(relays_actions);
-    serializeJson(settings.getDocumentRoot(), json);
+    //relayboardsettings.resetDocument();
+    relays_state_storage.loadKeyRelayActions(relays_state);
+    serializeJson(relays_state_storage.getDocumentRoot(), json);
     Serial.println(json);
     send(200, "text/json", json);
-    //settings.resetDocument();
+    //relayboardsettings.resetDocument();
 }
 
 void StatusAndConfigurationWebService::saveRelaySettings() {
@@ -61,8 +65,8 @@ void StatusAndConfigurationWebService::saveRelaySettings() {
 
     String failed_reason_template("failed to parse {b}B due to {r}");
     failed_reason_template.replace("{b}", String(payload_bytes));
-    //settings.resetDocument();
-    DeserializationError e = deserializeJson(settings.getDocument(), data);
+    //relayboardsettings.resetDocument();
+    DeserializationError e = deserializeJson(relays_state_storage.getDocument(), data);
 
     if (e) {
         String reason(failed_reason_template);
@@ -74,13 +78,15 @@ void StatusAndConfigurationWebService::saveRelaySettings() {
         response.replace("{e}", reason);
         send(400, "text/json", response);
     } else { // success
-        settings.saveSettings();
-        settings.writeKeyRelayActions(relays_actions);
+        relays_state_storage.saveSettings();
+        relays_state_storage.writeKeyRelayActions(relays_state);
+#if defined (ESP8266)
         Serial.println(String("stack free ") + ESP.getFreeContStack());
+#endif
         Serial.println(String("heap free ") + ESP.getFreeHeap());
         Serial.println(String("free sketch ") + ESP.getFreeSketchSpace());
 
-        //settings.resetDocument();
+        //relayboardsettings.resetDocument();
         send(200, "text/json", R"({"return":"true"})");
     }
 

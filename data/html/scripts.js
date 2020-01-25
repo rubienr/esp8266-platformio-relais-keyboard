@@ -116,8 +116,8 @@ function saveRelayValueByRadioIdToMatrix(path, value) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 function saveSettingsToDevice() {
-    console.log("save settings: " + settings);
-    sendJson("/api/settings/relay/save", settings, function (response) {
+    console.log("save relayboardsettings: " + settings);
+    sendJson("/api/relayboardsettings/relay/save", settings, function (response) {
         var status_field = document.getElementById("save_status");
         var response_object = JSON.parse(response);
         if (response_object["return"] == true || response_object["return"] == "true") {
@@ -141,7 +141,7 @@ function setUnsavedStateIndicator() {
 
 function addSaveButton(node, text, alternative_text) {
     if (text == null) text = "💾";
-    if (alternative_text == null) alternative_text = "save settings";
+    if (alternative_text == null) alternative_text = "save relayboardsettings";
     var button = node.appendChild(document.createElement("button"));
 
     button.setAttribute("type", "button");
@@ -202,7 +202,7 @@ function createTableFromSettings(id) {
         for (var idx in keys_actions[0][0]) {
             thd = table_header.appendChild(document.createElement("td"));
             thd.setAttribute("id", "thd." + idx);
-            //thd.innerHTML = settings["names"]["r"][idx] + "(Relay " + idx + ")";
+            //thd.innerHTML = relayboardsettings["names"]["r"][idx] + "(Relay " + idx + ")";
         }
 
         // add save button and status div
@@ -238,71 +238,71 @@ function createTableFromSettings(id) {
         }
     }
     //{ // table body
-        var path = "";
-        var keys_actions = settings["ka"];
-        for (var key_code in keys_actions) { // for each key
-            path += key_code;
-            var key_event_types = keys_actions[key_code];
-            var class_keycode = "key_code" + key_code;
+    var path = "";
+    var keys_actions = settings["ka"];
+    for (var key_code in keys_actions) { // for each key
+        path += key_code;
+        var key_event_types = keys_actions[key_code];
+        var class_keycode = "key_code" + key_code;
 
-            var table_row = table_body.appendChild(document.createElement("tr"));
+        var table_row = table_body.appendChild(document.createElement("tr"));
 
-            table_row.setAttribute("id", path);
-            var key_name = table_row.appendChild(document.createElement("td"));
-            key_name.setAttribute("id", path +".key_name");
-            key_name.setAttribute("rowspan", "2");
-            //key_name.innerHTML = settings["names"]["k"][key_code] + "(" + key_code + ")";
+        table_row.setAttribute("id", path);
+        var key_name = table_row.appendChild(document.createElement("td"));
+        key_name.setAttribute("id", path + ".key_name");
+        key_name.setAttribute("rowspan", "2");
+        //key_name.innerHTML = relayboardsettings["names"]["k"][key_code] + "(" + key_code + ")";
 
-            var key_event_type_count = 0;
-            for (var key_event_type_id in key_event_types) { // for each key event type (pressed, released)
-                path += "." + key_event_type_id;
-                var relay_states = key_event_types[key_event_type_id];
-                var class_event_type = "event_type" + key_event_type_id;
+        var key_event_type_count = 0;
+        for (var key_event_type_id in key_event_types) { // for each key event type (pressed, released)
+            path += "." + key_event_type_id;
+            var relay_states = key_event_types[key_event_type_id];
+            var class_event_type = "event_type" + key_event_type_id;
 
-                key_event_type_count += 1;
-                if (key_event_type_count >= 2) { // for rowspan
-                    table_row = table_body.appendChild(document.createElement("tr"));
+            key_event_type_count += 1;
+            if (key_event_type_count >= 2) { // for rowspan
+                table_row = table_body.appendChild(document.createElement("tr"));
+            }
+
+            var state = table_row.appendChild(document.createElement("td"));
+            state.innerHTML = event_type_dict[key_event_type_id];
+
+            for (var relay_id in relay_states) { // for each relay
+                path += "." + relay_id;
+                var class_relay_id = "relay_id" + relay_id;
+
+                var relay = table_row.appendChild(document.createElement("td"));
+                relay.setAttribute("id", path);
+
+                // create radio buttons
+                for (var json_action_id in relay_actuation_dict) {
+                    var input_attrs = relay_actuation_dict[json_action_id];
+                    relay.appendChild(document.createTextNode(input_attrs.symbol));
+                    var input = relay.appendChild(document.createElement("input"));
+                    input.setAttribute("type", "radio");
+                    input.setAttribute("alt", input_attrs.alt);
+                    input.setAttribute("name", path);
+                    input.setAttribute("id", path + "." + input_attrs.id);
+                    input.setAttribute("value", /*path + "." +*/ input_attrs.id);
+                    input.setAttribute("class", class_keycode + " " + class_event_type + " " + class_relay_id + " value" + input_attrs.id);
+                    input.setAttribute("onClick", "saveRelayValueByRadioIdToMatrix(\"" + path + "\", " + input_attrs.id + ");");
                 }
-
-                var state = table_row.appendChild(document.createElement("td"));
-                state.innerHTML = event_type_dict[key_event_type_id];
-
-                for (var relay_id in relay_states) { // for each relay
-                    path += "." + relay_id;
-                    var class_relay_id = "relay_id" + relay_id;
-
-                    var relay = table_row.appendChild(document.createElement("td"));
-                    relay.setAttribute("id", path);
-
-                    // create radio buttons
-                    for (var json_action_id in relay_actuation_dict) {
-                        var input_attrs = relay_actuation_dict[json_action_id];
-                        relay.appendChild(document.createTextNode(input_attrs.symbol));
-                        var input = relay.appendChild(document.createElement("input"));
-                        input.setAttribute("type", "radio");
-                        input.setAttribute("alt", input_attrs.alt);
-                        input.setAttribute("name", path);
-                        input.setAttribute("id", path + "." + input_attrs.id);
-                        input.setAttribute("value", /*path + "." +*/ input_attrs.id);
-                        input.setAttribute("class", class_keycode + " " + class_event_type + " " + class_relay_id + " value" + input_attrs.id);
-                        input.setAttribute("onClick", "saveRelayValueByRadioIdToMatrix(\"" + path + "\", " + input_attrs.id + ");");
-                    }
-                    path = path.slice(0, path.lastIndexOf("."));
-                }
-
-                { // add row shortcut buttons
-                    var shortcuts = table_row.appendChild(document.createElement("td"));
-
-                    for (var idx in relay_actuation_dict) {
-                        var attrs = relay_actuation_dict[idx];
-                        addShortcutButton(shortcuts, attrs.symbol, key_code, -1, key_event_type_id, attrs.id, attrs.alt);
-                    }
-                }
-
                 path = path.slice(0, path.lastIndexOf("."));
             }
-            path = "";
+
+            { // add row shortcut buttons
+                var shortcuts = table_row.appendChild(document.createElement("td"));
+
+                for (var idx in relay_actuation_dict) {
+                    var attrs = relay_actuation_dict[idx];
+                    addShortcutButton(shortcuts, attrs.symbol, key_code, -1, key_event_type_id, attrs.id, attrs.alt);
+                }
+            }
+
+            path = path.slice(0, path.lastIndexOf("."));
         }
+        path = "";
+    }
     //}
 }
 
@@ -321,8 +321,8 @@ function updateSettingsFromTableData() {
         var relay = id;
         var value = relay_setting.value;
 
-        console.log("settings[\"ka\"][" + key + "][" + event + "][" + relay + "]=" + value);
-        var keys_actions = settings["ka"];
+        console.log("relayboardsettings[\"ka\"][" + key + "][" + event + "][" + relay + "]=" + value);
+        var keys_actions = relayboardsettings["ka"];
         keys_actions[key][event][relay] = parseInt(value);
     }
 
@@ -401,7 +401,7 @@ function loadNamesListingFromSettings(type) {
     }
 
     var names = settings["names"][type];
-    var id_prefix ="names." + type + ".";
+    var id_prefix = "names." + type + ".";
 
     for (var name_idx in names) {
         var name = names[name_idx];

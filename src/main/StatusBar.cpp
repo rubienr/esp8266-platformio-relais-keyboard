@@ -1,7 +1,11 @@
 #include "StatusBar.h"
-
+#if defined(ESP8266)
 #include <include/wl_definitions.h>
 #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+#include <WiFiType.h>
+#include <WiFi.h>
+#endif
 
 namespace
 {
