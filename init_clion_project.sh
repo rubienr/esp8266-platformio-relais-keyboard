@@ -1,4 +1,4 @@
-#!/bin/Bash
+#!/bin/bash
 BASEDIR=$(dirname "$0")
 
 pushd `pwd`
